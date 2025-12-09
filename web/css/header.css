@@ -1,0 +1,26 @@
+/* 上に固定してちょっと空白作る */
+.header{
+    /* 好みによって変えてください */
+    background:#0ecbef;
+    width:100vw;
+    position:sticky;
+    padding:1rem;
+    font-size:var(--body-font);
+}
+/* コンテナの中に全部収める、flexboxで左ロゴ、右メニューに */
+.header .container{
+    display:flex;
+    justify-content: space-between;
+    width:100vw;
+}
+/* サイトロゴ。大きく表示し、ふわっと変わる */
+.header .container .siteLogo span{
+    color:#eee;
+    font-size: calc(var(--body-font) * 1.5);
+    font-weight: bold;
+    transition: color 0.5s ease-in-out;
+}
+/* ホバーしたら少し強く */
+.header .container .siteLogo span:hover{
+    color:#fff;
+}
