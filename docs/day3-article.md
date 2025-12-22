@@ -2,11 +2,11 @@
 
 こんにちは！Advent Calendar 3日目の担当者です。
 
-このプロジェクトは、Qiita Advent Calendar 2025 の企画「【自由参加型】Webアプリ開発アドベントカレンダー」の一環です。Day 2 までに実装されたビジュアルプログラミングエディタを、**Next.js で包装してローカル実行できるようにする**というのが今日のテーマです。
+このプロジェクトは、Qiita Advent Calendar 2025 の企画「【自由参加型】Webアプリ開発アドベントカレンダー」の一環です。これまでに実装されたビジュアルプログラミングエディタを、**Next.js で包装してローカル実行できるようにする**というのが今日のテーマです。
 
 ## 📋 背景
 
-Day 2 までに、JF6DEU さんが素晴らしいビジュアルプログラミングエディタを実装してくれました。このエディタは、以下の機能を持つ複雑な JavaScript アプリケーションです：
+これまでに、JF6DEU さんが素晴らしいビジュアルプログラミングエディタを実装してくれました。このエディタは、以下の機能を持つ複雑な JavaScript アプリケーションです：
 
 - **プログラム変換エンジン**: 日本語で書かれた命令を内部形式に変換
 - **複数の制御構文**: print、変数、配列、if/else、for、while ループなど
@@ -30,11 +30,7 @@ Day 2 までに、JF6DEU さんが素晴らしいビジュアルプログラミ�
 
 ### 1. Next.js プロジェクトの初期化
 
-```bash
-npm install next@latest react react-dom
-```
-
-`package.json` を更新して、Next.js のスクリプトを追加：
+既存の `package.json` を更新して、Next.js のスクリプトを追加：
 
 ```json
 {
@@ -43,9 +39,16 @@ npm install next@latest react react-dom
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
 ```
+
+その後、`npm install` で依存関係をインストール。
 
 ### 2. App Router の構成
 
