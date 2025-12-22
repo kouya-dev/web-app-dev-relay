@@ -1,0 +1,15 @@
+/* ボーダー枠内から計測 */
+*{
+    box-sizing: border-box;
+}
+/* 余計な枠を消去、フォントを設定 */
+html,head,body{
+    margin:0;
+    padding:0;
+    /* フォントは要望によって変えてください */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+:root{
+    /* ここを変えればフォントサイズが変わります */
+    --body-font: 0.5rem;
+}
