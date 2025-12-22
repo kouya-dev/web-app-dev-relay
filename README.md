@@ -20,6 +20,137 @@
 
 ---
 
+## 🎯 Day 3: Next.js でローカル実行対応
+
+このブランチ（`day3-nextjs-setup`）では、既存のビジュアルプログラミングエディタを **Next.js** で包装し、ローカル実行と Vercel へのデプロイに対応させました。
+
+### ✨ 実装内容
+
+- **Next.js 15 統合**: App Router を使用した最新の Next.js 構成
+- **既存コードの活用**: JF6DEU さんが実装した複雑なプログラム変換エンジンをそのまま活用
+- **ローカル実行対応**: `npm run dev` で `localhost:3000` で実行可能
+- **Vercel デプロイ対応**: GitHub との連携で自動デプロイ可能
+- **TypeScript 対応**: 型安全な開発環境
+
+---
+
+## 💻 セットアップ方法
+
+### 前提条件
+
+- Node.js 18.17 以上
+- npm または yarn
+
+### インストール
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/your-username/web-app-dev-relay.git
+cd web-app-dev-relay
+
+# day3-nextjs-setup ブランチに切り替え
+git checkout day3-nextjs-setup
+
+# 依存関係をインストール
+npm install
+```
+
+### ローカル実行
+
+```bash
+# 開発サーバーを起動
+npm run dev
+```
+
+ブラウザで [http://localhost:3000](http://localhost:3000) を開くと、ビジュアルプログラミングエディタが表示されます。
+
+### ビルド
+
+```bash
+# 本番用にビルド
+npm run build
+
+# ビルド結果を実行
+npm start
+```
+
+---
+
+## 🚀 Vercel へのデプロイ
+
+このプロジェクトは Vercel へのデプロイに対応しています。
+
+### デプロイ手順
+
+1. **GitHub にプッシュ**
+   ```bash
+   git push origin day3-nextjs-setup
+   ```
+
+2. **Vercel にログイン**
+   - [Vercel](https://vercel.com) にアクセス
+   - GitHub アカウントでログイン
+
+3. **プロジェクトをインポート**
+   - 「New Project」をクリック
+   - このリポジトリを選択
+   - 「Deploy」をクリック
+
+4. **自動デプロイ**
+   - 以降、`main` ブランチへのプッシュで自動的にデプロイされます
+
+---
+
+## 📁 プロジェクト構成
+
+```
+web-app-dev-relay/
+├── app/                    # Next.js App Router
+│   ├── layout.tsx         # ルートレイアウト
+│   ├── page.tsx           # メインページ
+│   └── globals.css        # グローバルスタイル
+├── public/                # 静的ファイル
+│   ├── css/              # スタイルシート
+│   ├── js/               # JavaScript
+│   └── ...
+├── web/                   # 既存の静的ファイル（互換性のため保持）
+├── next.config.js        # Next.js 設定
+├── tsconfig.json         # TypeScript 設定
+├── package.json          # 依存関係
+└── README.md             # このファイル
+```
+
+---
+
+## 🔧 開発ガイド
+
+### 既存コードの活用
+
+`web/js/main.js` に実装されている複雑なプログラム変換エンジンは、`app/page.tsx` で動的にロードされています。
+
+```typescript
+useEffect(() => {
+  const script = document.createElement('script');
+  script.src = '/js/main.js';
+  script.async = true;
+  document.body.appendChild(script);
+}, []);
+```
+
+### スタイルの追加
+
+- グローバルスタイル: `app/globals.css`
+- コンポーネント固有のスタイル: JSX の `<style jsx>` タグを使用
+
+### 次のステップ
+
+- [ ] React コンポーネント化（段階的に）
+- [ ] エディタ機能の拡張
+- [ ] テストの追加
+- [ ] パフォーマンス最適化
+
+---
+
 ## 💻 参加方法（非常に簡単です！）
 
 私たちは、**フォーク（Fork）**を通じた貢献を歓迎します。コラボレーター招待を待つ必要はありません。
