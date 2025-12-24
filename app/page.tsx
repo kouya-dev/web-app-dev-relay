@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { generateRows, RowData, RenderSegment } from './lib/visual-editor';
+import { Interpreter } from './lib/interpreter';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../public/css/reset.css';
 import '../public/css/header.css';
@@ -10,6 +11,13 @@ import '../public/css/header.css';
 export default function Home() {
   const [rows, setRows] = useState<RowData[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [currentStep, setCurrentStep] = useState<number>(-1);
+  const [output, setOutput] = useState<string[]>([]);
+  const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  const [variables, setVariables] = useState<Map<string, any>>(new Map());
+  const [arrays, setArrays] = useState<Map<string, any[]>>(new Map());
+
 
   const addRow = (programName: string, programArray: any[]) => {
     const [errorCode, result] = generateRows("I2R", programName, programArray);
@@ -19,6 +27,36 @@ export default function Home() {
       setRows([...rows, result as RowData]);
       setError(null);
     }
+  };
+
+  const handleRun = async () => {
+    setIsRunning(true);
+    setOutput([]);
+    setRuntimeError(null);
+    setCurrentStep(0);
+    setVariables(new Map());
+    setArrays(new Map());
+
+
+    const interpreter = new Interpreter(rows);
+    const stepDelayInput = document.getElementById('stepMs') as HTMLInputElement;
+    const stepDelay = stepDelayInput.value ? parseInt(stepDelayInput.value, 10) : 100;
+
+    const onStep = (pc: number, state: { variables: Map<string, any>, arrays: Map<string, any[]> }) => {
+        setCurrentStep(pc);
+        // Create new Map objects to trigger re-render
+        setVariables(new Map(state.variables));
+        setArrays(new Map(state.arrays));
+    };
+
+    const result = await interpreter.execute(onStep, stepDelay);
+
+    setOutput(result.output);
+    if (result.errors.length > 0) {
+        setRuntimeError(result.errors.join('\n'));
+    }
+    setIsRunning(false);
+    setCurrentStep(-1);
   };
 
   useEffect(() => {
@@ -67,7 +105,10 @@ export default function Home() {
       <div className="con1">
         <div className="con2">
           <div className="con3">
-            <div id="codeEditor" style={{ width: '100%', height: '100%' }}>
+            <div id="codeEditor" style={{ width: '100%', height: '100%', position: 'relative', overflowY: 'auto' }}>
+              <button className="btn btn-primary" onClick={handleRun} disabled={isRunning} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>
+                {isRunning ? '実行中...' : '実行'}
+              </button>
               {error && <div className="alert alert-danger">{error}</div>}
               {rowsWithNesting.map((row, index) => {
                 const [errorCode, segments] = generateRows("R2S", row) as [number, RenderSegment[]];
@@ -77,7 +118,12 @@ export default function Home() {
                 return (
                   <div
                     key={index}
-                    style={{ marginLeft: `${row.nestLevel * 20}px` }}
+                    style={{
+                        marginLeft: `${row.nestLevel * 20}px`,
+                        backgroundColor: currentStep === index ? '#d4edda' : 'transparent',
+                        padding: '2px 5px',
+                        borderRadius: '3px'
+                    }}
                     className="d-flex align-items-center mb-1"
                   >
                     {segments.map((segment, segIndex) => {
@@ -115,6 +161,36 @@ export default function Home() {
                 );
               })}
             </div>
+          </div>
+          {/* Output Panel */}
+          <div className="output-panel mt-3 p-3 border rounded">
+              <h5>実行結果</h5>
+              {runtimeError && <div className="alert alert-danger">{runtimeError}</div>}
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', height: '100px', overflowY: 'auto' }}>
+                <code>{output.join('\n')}</code>
+              </pre>
+              <hr />
+              <h5>変数の状態</h5>
+               <div style={{ height: '150px', overflowY: 'auto' }}>
+                 <h6>-- Variables --</h6>
+                 <ul className="list-group">
+                    {[...variables.entries()].map(([key, value]) => (
+                        <li key={key} className="list-group-item d-flex justify-content-between align-items-center">
+                            {key}
+                            <span className="badge bg-primary rounded-pill">{JSON.stringify(value)}</span>
+                        </li>
+                    ))}
+                 </ul>
+                 <h6 className="mt-2">-- Arrays --</h6>
+                 <ul className="list-group">
+                     {[...arrays.entries()].map(([key, value]) => (
+                        <li key={key} className="list-group-item d-flex justify-content-between align-items-center">
+                            {key}
+                            <span className="badge bg-info rounded-pill">{JSON.stringify(value)}</span>
+                        </li>
+                    ))}
+                 </ul>
+               </div>
           </div>
           <hr />
           <div className="inputs">
