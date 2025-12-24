@@ -40,7 +40,8 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "types/bootstrap.d.ts"
   ],
   "references": [
     {

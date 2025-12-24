@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import BootstrapJS from "./components/BootstrapJS";
 
 export const metadata: Metadata = {
   title: "Web App Dev Relay - ビジュアルプログラミングエディタ",
@@ -13,7 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {children}
+        <BootstrapJS />
+      </body>
     </html>
   );
 }

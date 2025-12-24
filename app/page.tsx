@@ -1,52 +1,60 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { generateRows, RowData, RenderSegment } from './lib/visual-editor';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../public/css/reset.css';
+import '../public/css/header.css';
+
 
 export default function Home() {
+  const [rows, setRows] = useState<RowData[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const addRow = (programName: string, programArray: any[]) => {
+    const [errorCode, result] = generateRows("I2R", programName, programArray);
+    if (errorCode === 1) {
+      setError(result as string);
+    } else {
+      setRows([...rows, result as RowData]);
+      setError(null);
+    }
+  };
+
   useEffect(() => {
-    // 既存のJavaScriptコードを動的にロード
-    const script = document.createElement('script');
-    script.src = '/js/main.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    // Bootstrap JSをロード
-    const bootstrapScript = document.createElement('script');
-    bootstrapScript.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
-    bootstrapScript.crossOrigin = 'anonymous';
-    bootstrapScript.async = true;
-    document.body.appendChild(bootstrapScript);
-
-    return () => {
-      // クリーンアップ
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-      if (bootstrapScript.parentNode) {
-        bootstrapScript.parentNode.removeChild(bootstrapScript);
-      }
-    };
+    // Dynamically import Bootstrap JS for client-side usage
+    import('bootstrap/dist/js/bootstrap.bundle.min.js');
   }, []);
+
+  // Calculate cumulative nesting level for rendering
+  const rowsWithNesting = rows.reduce((acc, row) => {
+    const previousNest = acc.length > 0 ? acc[acc.length - 1].cumulativeNest : 0;
+    const nestChange = row.nestValue;
+    let currentAbsoluteNest = previousNest;
+
+    if (nestChange < 0) {
+        currentAbsoluteNest = Math.max(0, previousNest + nestChange);
+    }
+
+    const newRow = {
+        ...row,
+        nestLevel: currentAbsoluteNest,
+        cumulativeNest: nestChange > 0 ? previousNest + nestChange : currentAbsoluteNest
+    };
+
+    acc.push(newRow);
+    return acc;
+  }, [] as (RowData & { nestLevel: number, cumulativeNest: number })[]);
+
 
   return (
     <>
-      {/* Bootstrap CSS */}
-      <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        crossOrigin="anonymous"
-      />
-      
-      {/* 既存のCSS */}
-      <link rel="stylesheet" href="/css/reset.css" />
-      <link rel="stylesheet" href="/css/header.css" />
-
       {/* ヘッダー */}
       <div className="header">
         <div className="container">
           {/* サイトロゴ */}
           <div className="siteLogo">
-            <span>NaN!</span>
+            <span>Visual Programming Editor</span>
           </div>
           {/* メニュー */}
           <div className="menu">
@@ -59,7 +67,54 @@ export default function Home() {
       <div className="con1">
         <div className="con2">
           <div className="con3">
-            <div id="codeEditor" style={{ width: '100%', height: '100%' }}></div>
+            <div id="codeEditor" style={{ width: '100%', height: '100%' }}>
+              {error && <div className="alert alert-danger">{error}</div>}
+              {rowsWithNesting.map((row, index) => {
+                const [errorCode, segments] = generateRows("R2S", row) as [number, RenderSegment[]];
+                if (errorCode === 1) {
+                  return <div key={index} className="alert alert-warning"><code>{(segments[0] as any).content}</code></div>;
+                }
+                return (
+                  <div
+                    key={index}
+                    style={{ marginLeft: `${row.nestLevel * 20}px` }}
+                    className="d-flex align-items-center mb-1"
+                  >
+                    {segments.map((segment, segIndex) => {
+                        switch (segment.type) {
+                            case 'text':
+                                return <span key={segIndex} style={{ whiteSpace: 'pre' }}>{segment.content}</span>;
+                            case 'input':
+                                return (
+                                    <input
+                                        key={segIndex}
+                                        type="text"
+                                        className="form-control form-control-sm mx-1"
+                                        style={{ width: 'auto', display: 'inline-block' }}
+                                        defaultValue={segment.value}
+                                    />
+                                );
+                            case 'select':
+                                return (
+                                    <select
+                                        key={segIndex}
+                                        className="form-select form-select-sm mx-1"
+                                        style={{ width: 'auto', display: 'inline-block' }}
+                                        defaultValue={segment.selectedValue}
+                                    >
+                                        {segment.options.map(opt => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                );
+                            default:
+                                return null;
+                        }
+                    })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <hr />
           <div className="inputs">
@@ -79,18 +134,16 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
                 onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('print');
-                  }
+                  const input = document.getElementById('printInput') as HTMLInputElement;
+                  addRow('print', [input.value]);
                 }}
               >
                 追加
               </button>
             </div>
             <div className="form-text" id="basic-addon4">
-              複数を一行で出力するにはカンマ区切りで書きます。文字はダブルクォーテーション(")で括ります。
+              複数を一行で出力するにはカンマ区切りで書きます。文字はダブルクォーテーション(&quot;)で括ります。
             </div>
             <hr />
             <label htmlFor="variableName" className="form-label">
@@ -115,18 +168,17 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
                 onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('variable');
-                  }
+                  const input1 = document.getElementById('variableInput1') as HTMLInputElement;
+                  const input2 = document.getElementById('variableInput2') as HTMLInputElement;
+                  addRow('variable', [input1.value, input2.value]);
                 }}
               >
                 追加
               </button>
             </div>
             <div className="form-text" id="basic-addon4">
-              変数を入力します。例えば、A = 1のような感じです。文字はダブルクォーテーション(")で括ります。
+              変数を入力します。例えば、A = 1のような感じです。文字はダブルクォーテーション(&quot;)で括ります。
             </div>
             <hr />
             <label htmlFor="variableArrayName" className="form-label">
@@ -152,11 +204,10 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
                 onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('array');
-                  }
+                  const input1 = document.getElementById('arrayInput1') as HTMLInputElement;
+                  const input2 = document.getElementById('arrayInput2') as HTMLInputElement;
+                  addRow('array', [input1.value, input2.value]);
                 }}
               >
                 追加
@@ -184,11 +235,9 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
                 onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('if');
-                  }
+                    const input = document.getElementById('ifInput') as HTMLInputElement;
+                    addRow('if', [input.value]);
                 }}
               >
                 追加
@@ -236,7 +285,7 @@ export default function Home() {
               />
               <span className="input-group-text">ずつ</span>
               <select className="form-select" id="forInput5">
-                <option value="inc" defaultChecked>
+                <option value="inc" >
                   増やし
                 </option>
                 <option value="dec">減らし</option>
@@ -245,11 +294,13 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
                 onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('for');
-                  }
+                  const input1 = document.getElementById('forInput1') as HTMLInputElement;
+                  const input2 = document.getElementById('forInput2') as HTMLInputElement;
+                  const input3 = document.getElementById('forInput3') as HTMLInputElement;
+                  const input4 = document.getElementById('forInput4') as HTMLInputElement;
+                  const input5 = document.getElementById('forInput5') as HTMLSelectElement;
+                  addRow('for', [input1.value, input2.value, input3.value, input4.value, input5.value]);
                 }}
               >
                 追加
@@ -274,11 +325,9 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
                 onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('while');
-                  }
+                  const input = document.getElementById('whileInput') as HTMLInputElement;
+                  addRow('while', [input.value]);
                 }}
               >
                 追加
@@ -297,12 +346,7 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
-                onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('endLoop');
-                  }
-                }}
+                onClick={() => addRow('endLoop', [])}
               >
                 追加
               </button>
@@ -317,12 +361,7 @@ export default function Home() {
               <button
                 className="btn btn-secondary"
                 type="button"
-                id="button-addon2"
-                onClick={() => {
-                  if (typeof window !== 'undefined' && (window as any).getButton) {
-                    (window as any).getButton('ifElse');
-                  }
-                }}
+                onClick={() => addRow('ifElse', [])}
               >
                 追加
               </button>
@@ -374,7 +413,7 @@ export default function Home() {
               <select className="form-select" aria-label="viewVariables">
                 <option value="view1">一行ごとに表示する</option>
                 <option value="viewLast">最後に表示する</option>
-                <option value="nonView" defaultChecked>
+                <option value="nonView" >
                   表示しない
                 </option>
               </select>
