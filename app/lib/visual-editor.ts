@@ -146,7 +146,7 @@ function handleI2R(programName: string, programArray: any[]): GenerateRowsResult
             break;
 
         case "ifElse":
-            nestValue = 1;
+            nestValue = 0;
             outputValue = {};
             break;
 

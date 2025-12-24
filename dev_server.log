@@ -1,0 +1,96 @@
+
+> web-app-dev-relay-project@1.0.0 dev
+> next dev
+
+   ▲ Next.js 15.5.9
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 2.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 9.3s (608 modules)
+ GET / 200 in 10948ms
+ GET / 200 in 153ms
+ ✓ Compiled in 495ms (555 modules)
+ ✓ Compiled in 254ms (555 modules)
+ GET / 200 in 368ms
+ ✓ Compiled in 503ms (555 modules)
+ ✓ Compiled in 248ms (555 modules)
+ GET / 200 in 377ms
+ ⨯ ./app/lib/interpreter.ts
+Error:
+
+Caused by:
+    0: Failed to read source code from /app/app/lib/interpreter.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./app/lib/interpreter.ts
+./app/page.tsx
+ ⨯ ./app/lib/interpreter.ts
+Error:
+
+Caused by:
+    0: Failed to read source code from /app/app/lib/interpreter.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./app/lib/interpreter.ts
+./app/page.tsx
+ ⨯ ./app/lib/interpreter.ts
+Error:
+
+Caused by:
+    0: Failed to read source code from /app/app/lib/interpreter.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./app/lib/interpreter.ts
+./app/page.tsx
+ ○ Compiling /_error ...
+ ⨯ ./app/lib/interpreter.ts
+Error:
+
+Caused by:
+    0: Failed to read source code from /app/app/lib/interpreter.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./app/lib/interpreter.ts
+./app/page.tsx
+ GET / 500 in 7763ms
+ ✓ Compiled /_error in 822ms (895 modules)
+ GET / 200 in 490ms
+ ✓ Compiled in 565ms (895 modules)
+ ✓ Compiled in 245ms (895 modules)
+ GET / 200 in 447ms
+ ✓ Compiled in 867ms (895 modules)
+ GET / 200 in 602ms
+ ⨯ ./app/lib/interpreter.ts
+Error:
+
+Caused by:
+    0: Failed to read source code from /app/app/lib/interpreter.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./app/lib/interpreter.ts
+./app/page.tsx
+ ⨯ ./app/lib/interpreter.ts
+Error:
+
+Caused by:
+    0: Failed to read source code from /app/app/lib/interpreter.ts
+    1: No such file or directory (os error 2)
+
+Import trace for requested module:
+./app/lib/interpreter.ts
+./app/page.tsx
+ ✓ Compiled in 6s (895 modules)
+ ✓ Compiled in 5.2s (895 modules)
