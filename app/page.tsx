@@ -465,6 +465,7 @@ export default function Home() {
                 className="form-control"
                 placeholder="数字"
                 aria-label="stepMs"
+                id="stepMs"
               />
               <span className="input-group-text">ミリ秒</span>
               <span className="input-group-text">待つ</span>
