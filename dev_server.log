@@ -92,3 +92,4 @@ Caused by:
 Import trace for requested module:
 ./app/lib/interpreter.ts
 ./app/page.tsx
+ ✓ Compiled in 6s (895 modules)
